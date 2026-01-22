@@ -38,7 +38,7 @@ main, section{
     height: 100%;
 }
 section{
-    padding: 40px;
+    padding: var(--space-2xl);
 }
 
 section .infos{
