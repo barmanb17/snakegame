@@ -187,3 +187,19 @@ window.addEventListener('keyup', () => {
         changeSpeed(NORMAL_SPEED);
     }
 })
+
+const controlButtons = document.querySelectorAll('.mobile-controls button');
+
+controlButtons.forEach(button => {
+  button.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // stops scrolling
+
+    const dir = button.dataset.dir;
+
+    if (dir === 'up' && direction !== 'down') direction = 'up';
+    if (dir === 'down' && direction !== 'up') direction = 'down';
+    if (dir === 'left' && direction !== 'right') direction = 'left';
+    if (dir === 'right' && direction !== 'left') direction = 'right';
+  });
+});
+

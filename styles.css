@@ -135,3 +135,34 @@ section .infos{
     align-items: center;
     gap: var(--space-lg);
 }
+
+
+.mobile-controls {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.mobile-controls button {
+  font-size: 24px;
+  padding: 14px 18px;
+  margin: 6px;
+  border-radius: 10px;
+  border: none;
+  background: #333;
+  color: white;
+}
+
+.mobile-controls .middle {
+  display: flex;
+  justify-content: center;
+}
+
+/* Show controls only on mobile */
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: block;
+  }
+}
