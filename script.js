@@ -46,10 +46,14 @@ for (let x = 0; x < rows; x++) {
 
 // ===== HELPERS =====
 function randomFood() {
-  return {
-    x: Math.floor(Math.random() * rows),
-    y: Math.floor(Math.random() * cols)
-  };
+  let pos;
+  do {
+    pos = {
+      x: Math.floor(Math.random() * rows),
+      y: Math.floor(Math.random() * cols)
+    };
+  } while (snake.some(s => s.x === pos.x && s.y === pos.y));
+  return pos;
 }
 
 function drawFood() {
@@ -68,23 +72,32 @@ function drawSnake() {
   });
 }
 
+function isSelfCollision(newHead) {
+  return snake.some(
+    (segment, index) =>
+      index !== 0 &&
+      segment.x === newHead.x &&
+      segment.y === newHead.y
+  );
+}
+
 // ===== CORE GAME LOOP =====
 function render() {
   const head = snake[0];
   let newHead;
 
-  // calculate new head
   if (direction === 'right') newHead = { x: head.x, y: head.y + 1 };
-  if (direction === 'left') newHead = { x: head.x, y: head.y - 1 };
-  if (direction === 'up') newHead = { x: head.x - 1, y: head.y };
-  if (direction === 'down') newHead = { x: head.x + 1, y: head.y };
+  else if (direction === 'left') newHead = { x: head.x, y: head.y - 1 };
+  else if (direction === 'up') newHead = { x: head.x - 1, y: head.y };
+  else if (direction === 'down') newHead = { x: head.x + 1, y: head.y };
 
-  // wall collision
+  // ✅ COLLISION CHECK (FIXED)
   if (
     newHead.x < 0 ||
     newHead.x >= rows ||
     newHead.y < 0 ||
-    newHead.y >= cols
+    newHead.y >= cols ||
+    isSelfCollision(newHead)
   ) {
     endGame();
     return;
@@ -108,7 +121,7 @@ function render() {
     food = randomFood();
     drawFood();
   } else {
-    snake.pop(); // normal move
+    snake.pop();
   }
 
   drawSnake();
@@ -117,11 +130,14 @@ function render() {
 // ===== GAME CONTROL =====
 function startGame() {
   modal.style.display = 'none';
+
   food = randomFood();
   drawFood();
 
+  clearInterval(intervalId);
   intervalId = setInterval(render, NORMAL_SPEED);
 
+  clearInterval(timerIntervalId);
   timerIntervalId = setInterval(() => {
     time++;
     const min = String(Math.floor(time / 60)).padStart(2, '0');
@@ -140,8 +156,8 @@ function endGame() {
 }
 
 function changeSpeed(speed) {
-    clearInterval(intervalId);
-    intervalId = setInterval(render, speed);
+  clearInterval(intervalId);
+  intervalId = setInterval(render, speed);
 }
 
 function restartGame() {
@@ -169,31 +185,32 @@ restartButton.addEventListener('click', restartGame);
 let isFast = false;
 
 window.addEventListener('keydown', (e) => {
-    if(e.repeat) return;
+  if (e.repeat) return;
+
   if (e.key === 'ArrowUp' && direction !== 'down') direction = 'up';
   if (e.key === 'ArrowDown' && direction !== 'up') direction = 'down';
   if (e.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
   if (e.key === 'ArrowRight' && direction !== 'left') direction = 'right';
 
-  if(!isFast) {
+  if (!isFast) {
     isFast = true;
     changeSpeed(FAST_SPEED);
   }
 });
 
 window.addEventListener('keyup', () => {
-    if(isFast) {
-        isFast = false;
-        changeSpeed(NORMAL_SPEED);
-    }
-})
+  if (isFast) {
+    isFast = false;
+    changeSpeed(NORMAL_SPEED);
+  }
+});
 
+// ===== MOBILE BUTTONS =====
 const controlButtons = document.querySelectorAll('.mobile-controls button');
 
 controlButtons.forEach(button => {
   button.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // stops scrolling
-
+    e.preventDefault();
     const dir = button.dataset.dir;
 
     if (dir === 'up' && direction !== 'down') direction = 'up';
@@ -202,4 +219,3 @@ controlButtons.forEach(button => {
     if (dir === 'right' && direction !== 'left') direction = 'right';
   });
 });
-
