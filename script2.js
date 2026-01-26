@@ -79,3 +79,25 @@ function isSelfCollision(newHead) {
         }
     )
 }
+
+
+function render() {
+    const head = snake[0];
+    let newHead;
+
+    if(direction === 'right') newHead = {x: head.x, y:head.y + 1};
+  else if (direction === 'left') newHead = { x: head.x, y: head.y - 1 };
+  else if (direction === 'up') newHead = { x: head.x - 1, y: head.y };
+  else if (direction === 'down') newHead = { x: head.x + 1, y: head.y };
+
+  // ✅ COLLISION CHECK (FIXED)
+  if (
+    newHead.x < 0 ||
+    newHead.x >= rows ||
+    newHead.y < 0 ||
+    newHead.y >= cols ||
+    isSelfCollision(newHead)
+  ) {
+    endGame();
+    return;
+  }}
